@@ -1,54 +1,44 @@
 include(SelectLibraryConfigurations)
 
+#GTEST_FOUND``
+#GTEST_INCLUDE_DIRS
+# examples used FindOpenThreads.cmake, FindGTest.cmake
 
-find_path(OPENTHREADS_INCLUDE_DIR OpenThreads/Thread
+find_path(GTEST_INCLUDE_DIR gtest/gtest.h
     HINTS
-        ENV OPENTHREADS_INCLUDE_DIR
-        ENV OPENTHREADS_DIR
-        ENV OSG_INCLUDE_DIR
-        ENV OSG_DIR
-        ENV OSGDIR
-        ENV OpenThreads_ROOT
-        ENV OSG_ROOT
-        ${OPENTHREADS_DIR}
-        ${OSG_DIR}
+        ENV GTEST_ROOT
+        ENV GTEST_DIR
+        ${GTEST_ROOT}
+        ${GTEST_DIR}
     PATH_SUFFIXES include
 )
+mark_as_advanced(GTEST_INCLUDE_DIR)
 
 
-find_library(OPENTHREADS_LIBRARY_RELEASE
-    NAMES OpenThreads OpenThreadsWin32
-    HINTS
-        ENV OPENTHREADS_LIBRARY_DIR
-        ENV OPENTHREADS_DIR
-        ENV OSG_LIBRARY_DIR
-        ENV OSG_DIR
-        ENV OSGDIR
-        ENV OpenThreads_ROOT
-        ENV OSG_ROOT
-        ${OPENTHREADS_DIR}
-        ${OSG_DIR}
-    PATH_SUFFIXES lib
-)
+function(__gtest_find_library _name)
+    find_library(${_name}
+        NAMES ${ARGN}
+        HINTS
+            ENV GTEST_ROOT
+            ENV GTEST_DIR
+            ${GTEST_ROOT}
+            ${GTEST_DIR}
+        PATH_SUFFIXES lib
+    )
+    mark_as_advanced(${_name})
+endfunction()
 
-find_library(OPENTHREADS_LIBRARY_DEBUG
-    NAMES OpenThreadsd OpenThreadsWin32d
-    HINTS
-        ENV OPENTHREADS_DEBUG_LIBRARY_DIR
-        ENV OPENTHREADS_LIBRARY_DIR
-        ENV OPENTHREADS_DIR
-        ENV OSG_LIBRARY_DIR
-        ENV OSG_DIR
-        ENV OSGDIR
-        ENV OpenThreads_ROOT
-        ENV OSG_ROOT
-        ${OPENTHREADS_DIR}
-        ${OSG_DIR}
-    PATH_SUFFIXES lib
-)
+__gtest_find_library(GTEST_LIBRARY_RELEASE      gtest)
+__gtest_find_library(GTEST_LIBRARY_DEBUG        gtestd)
+__gtest_find_library(GTEST_MAIN_LIBRARY_RELEASE gtest_main)
+__gtest_find_library(GTEST_MAIN_LIBRARY_DEBUG   gtest_maind)
 
-select_library_configurations(OPENTHREADS)
+select_library_configurations(GTEST)
+select_library_configurations(GTEST_MAIN)
 
-include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(OpenThreads DEFAULT_MSG
-    OPENTHREADS_LIBRARY OPENTHREADS_INCLUDE_DIR)
+include(FindPackageHandleStandardArgs)
+#find_package_handle_standard_args(OpenThreads DEFAULT_MSG
+#    OPENTHREADS_LIBRARY OPENTHREADS_INCLUDE_DIR)
+
+find_package_handle_standard_args(GTest DEFAULT_MSG
+    GTEST_LIBRARY GTEST_INCLUDE_DIR)
